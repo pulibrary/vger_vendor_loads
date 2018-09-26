@@ -15,9 +15,14 @@ Currently, this program searches for:
 
 It auto-fixes:
 
-1. Remove invalid UTF-8 characters
-2. Remove invalid XML 1.0 characters
+1. Invalid UTF-8 characters (removes them)
+2. Invalid XML 1.0 characters (removes them)
 3. Values in the 008 that can be auto-corrected
+4. Empty subfields
+5. Values in the leader that can be auto-corrected
+6. Character composition (normalizing diacritics)
+7. Extra spaces in subfields
+8. Tab and newline characters (converted to a space)
 
 ## Configuration
 Several environment variables will need to be defined. In addition, I have provided a sample YAML file; you will have to create your own YAML file.
