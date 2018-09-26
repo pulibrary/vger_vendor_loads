@@ -1,0 +1,2 @@
+-  { dir: 'sample1', code: 'test', emails: ['test@test.edu'], encoding: 'MARC-8' }
+-  { dir: 'sample2', code: 'test', emails: ['test@test.edu', 'test2@test.edu'], encoding: 'UTF-8' }
