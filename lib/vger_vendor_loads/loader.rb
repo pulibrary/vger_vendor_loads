@@ -20,30 +20,13 @@ class LoadProfile
 end
 
 def clean_record(record)
-  empty_subfield = false
-  leader_error = false
-  tab_newline = false
-  extra_space = false
-  composed_chars = false
-  f008 = false
-  utf8 = false
-  xml = false
-  if empty_subfields?(record)
-    record = empty_subfield_fix(record)
-    empty_subfield = true
-  end
-  if leader_errors?(record)
-    record = leaderfix(record)
-    leader_error = true
-  end
-  if tab_newline_char?(record)
-    record = tab_newline_fix(record)
-    tab_newline = true
-  end
+  record = bad_utf8_fix(record)
+  record = empty_subfield_fix(record)
+  record = leaderfix(record)
+  record = tab_newline_fix(record)
   record = extra_space_fix(record)
   record = composed_chars_normalize(record)
   record = fix_008(record)
-  record = bad_utf8_fix(record)
   record = invalid_xml_fix(record)
   record
 end

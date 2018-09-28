@@ -25,12 +25,15 @@ all_profiles.each do |profile|
     inv_xml_flag = false
     f245_flag = false
     f008_flag = false
+    bad_marc8 = false
     not_marc = false
     no_recs = false
-    reader = MARC::Reader.new(file, external_encoding: load_profile.encoding, invalid: :replace, replace: '')
-    record = nil
+    reader = MARC::Reader.new(file, external_encoding: load_profile.encoding)
     begin
-      record = reader.first
+      reader.each do |record|
+      end
+    rescue Encoding::InvalidByteSequenceError
+      bad_marc8 = true
     rescue
       not_marc = true
     end
@@ -38,6 +41,10 @@ all_profiles.each do |profile|
       FileUtils.mv(file, "#{load_profile.out_dir}/nonmarc_#{filename}")
       subject = "non-MARC file #{filename} submitted for bulk load"
       message_body = "A non-MARC file was submitted for bulk load.\r\n\r\nFile: #{file}"
+    elsif bad_marc8
+      FileUtis.mv(file, "#{load_profile.out_dir}/badmarc8_#{filename}")
+      subject = "file #{filename} with invalid MARC-8 bytes was submitted for bulk load"
+      message_body = "A MARC-8 file with invalid bytes was submitted for bulk load.\r\n\r\nFile: #{file}"
     else
       subject = "Error records from bulk load #{filename}"
       message_body = "Error records attached for #{filename}"
@@ -52,11 +59,12 @@ all_profiles.each do |profile|
       inv_xml_writer = MARC::Writer.new(xml_name)
       error_245_writer = MARC::Writer.new(f245_name)
       error_008_writer = MARC::Writer.new(f008_name)
-      reader = load_profile.encoding == 'MARC-8' ? MARC::Reader.new(file, external_encoding: load_profile.encoding, invalid: :replace, replace: '') : MARC::Reader.new(file, external_encoding: load_profile.encoding)
+      reader = MARC::Reader.new(file, external_encoding: load_profile.encoding)
       reader.each do |record|
         if bad_utf8?(record)
           bad_utf8_writer.write(bad_utf8_identify(record))
         end
+        record = bad_utf8_fix(record)
         if invalid_xml_chars?(record)
           inv_xml_writer.write(invalid_xml_identify(record))
         end
@@ -110,7 +118,7 @@ all_profiles.each do |profile|
         end
       end
     end
-    if utf_flag || inv_xml_flag || f245_flag || f008_flag || not_marc || no_recs
+    if utf_flag || inv_xml_flag || f245_flag || f008_flag || not_marc || no_recs || bad_marc8
       puts 'there were errors'
       puts subject
       puts message_body
