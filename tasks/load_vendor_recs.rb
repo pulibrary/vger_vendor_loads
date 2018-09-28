@@ -27,7 +27,7 @@ all_profiles.each do |profile|
     f008_flag = false
     not_marc = false
     no_recs = false
-    reader = MARC::Reader.new(file, external_encoding: load_profile.encoding)
+    reader = MARC::Reader.new(file, external_encoding: load_profile.encoding, invalid: :replace, replace: '')
     record = nil
     begin
       record = reader.first
@@ -52,7 +52,7 @@ all_profiles.each do |profile|
       inv_xml_writer = MARC::Writer.new(xml_name)
       error_245_writer = MARC::Writer.new(f245_name)
       error_008_writer = MARC::Writer.new(f008_name)
-      reader = MARC::Reader.new(file, external_encoding: load_profile.encoding)
+      reader = load_profile.encoding == 'MARC-8' ? MARC::Reader.new(file, external_encoding: load_profile.encoding, invalid: :replace, replace: '') : MARC::Reader.new(file, external_encoding: load_profile.encoding)
       reader.each do |record|
         if bad_utf8?(record)
           bad_utf8_writer.write(bad_utf8_identify(record))
