@@ -42,7 +42,7 @@ all_profiles.each do |profile|
       subject = "non-MARC file #{filename} submitted for bulk load"
       message_body = "A non-MARC file was submitted for bulk load.\r\n\r\nFile: #{file}"
     elsif bad_marc8
-      FileUtis.mv(file, "#{load_profile.out_dir}/badmarc8_#{filename}")
+      FileUtils.mv(file, "#{load_profile.out_dir}/badmarc8_#{filename}")
       subject = "file #{filename} with invalid MARC-8 bytes was submitted for bulk load"
       message_body = "A MARC-8 file with invalid bytes was submitted for bulk load.\r\n\r\nFile: #{file}"
     else
