@@ -12,10 +12,10 @@ class LoadProfile
   end
   attr_accessor :in_dir, :out_dir, :error_dir, :import_code, :emails, :encoding
   def incoming_files
-    Dir.glob("#{@in_dir}/*.*")
+    Dir.glob("#{@in_dir}/*")
   end
   def has_files?
-    Dir.glob("#{@in_dir}/*.*").size > 0
+    Dir.glob("#{@in_dir}/*").size > 0
   end
 end
 
