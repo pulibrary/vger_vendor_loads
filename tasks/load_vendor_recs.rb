@@ -74,6 +74,7 @@ all_profiles.each do |profile|
           error_008_writer.write(record)
         else
           record = clean_record(record)
+          record.leader[9] = 'a' # Make record parse as UTF-8
           writer.write(record)
         end
       end
@@ -82,22 +83,22 @@ all_profiles.each do |profile|
       inv_xml_writer.close
       error_245_writer.close
       error_008_writer.close
-      if File.size(utf_name) == 0 
+      if File.size(utf_name) == 0
         FileUtils.rm(utf_name)
       else
         utf_flag = true
       end
-      if File.size(xml_name) == 0 
+      if File.size(xml_name) == 0
         FileUtils.rm(xml_name)
       else
         inv_xml_flag = true
       end
-      if File.size(f245_name) == 0 
+      if File.size(f245_name) == 0
         FileUtils.rm(f245_name)
       else
         f245_flag = true
       end
-      if File.size(f008_name) == 0 
+      if File.size(f008_name) == 0
         FileUtils.rm(f008_name)
       else
         f008_flag = true
