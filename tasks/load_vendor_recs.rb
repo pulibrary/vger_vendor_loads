@@ -41,10 +41,6 @@ all_profiles.each do |profile|
       FileUtils.mv(file, "#{load_profile.out_dir}/nonmarc_#{filename}")
       subject = "non-MARC file #{filename} submitted for bulk load"
       message_body = "A non-MARC file was submitted for bulk load.\r\n\r\nFile: #{file}"
-    elsif bad_marc8
-      FileUtils.mv(file, "#{load_profile.out_dir}/badmarc8_#{filename}")
-      subject = "file #{filename} with invalid MARC-8 bytes was submitted for bulk load"
-      message_body = "A MARC-8 file with invalid bytes was submitted for bulk load.\r\n\r\nFile: #{file}"
     else
       subject = "Error records from bulk load #{filename}"
       message_body = "Error records attached for #{filename}"
@@ -60,23 +56,28 @@ all_profiles.each do |profile|
       error_245_writer = MARC::Writer.new(f245_name)
       error_008_writer = MARC::Writer.new(f008_name)
       reader = MARC::Reader.new(file, external_encoding: load_profile.encoding)
+      if bad_marc8
+        reader = MARC::Reader.new(file, external_encoding: load_profile.encoding, invalid: :replace, replace: '')
+        FileUtils.cp(file, "#{load_profile.out_dir}/badmarc8_#{filename}")
+        subject = "file #{filename} with invalid MARC-8 bytes was submitted for bulk load"
+        message_body = "A MARC-8 file with invalid bytes was submitted for bulk load.\r\n\r\nFile: #{file}"
+      end
       reader.each do |record|
-        if bad_utf8?(record)
-          bad_utf8_writer.write(bad_utf8_identify(record))
-        end
-        record = bad_utf8_fix(record)
-        if invalid_xml_chars?(record)
-          inv_xml_writer.write(invalid_xml_identify(record))
-        end
-        if multiple_no_245?(record)
-          error_245_writer.write(record)
-        elsif multiple_no_008?(record)
-          error_008_writer.write(record)
-        else
-          record = clean_record(record)
-          record.leader[9] = 'a' # Make record parse as UTF-8
-          writer.write(record)
-        end
+      if bad_utf8?(record)
+        bad_utf8_writer.write(bad_utf8_identify(record))
+      end
+      record = bad_utf8_fix(record)
+      if invalid_xml_chars?(record)
+        inv_xml_writer.write(invalid_xml_identify(record))
+      end
+      if multiple_no_245?(record)
+        error_245_writer.write(record)
+      elsif multiple_no_008?(record)
+        error_008_writer.write(record)
+      else
+        record = clean_record(record)
+        record.leader[9] = 'a' # Make record parse as UTF-8
+        writer.write(record)
       end
       writer.close
       bad_utf8_writer.close
