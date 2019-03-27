@@ -63,21 +63,23 @@ all_profiles.each do |profile|
         message_body = "A MARC-8 file with invalid bytes was submitted for bulk load.\r\n\r\nFile: #{file}"
       end
       reader.each do |record|
-      if bad_utf8?(record)
-        bad_utf8_writer.write(bad_utf8_identify(record))
-      end
-      record = bad_utf8_fix(record)
-      if invalid_xml_chars?(record)
-        inv_xml_writer.write(invalid_xml_identify(record))
-      end
-      if multiple_no_245?(record)
-        error_245_writer.write(record)
-      elsif multiple_no_008?(record)
-        error_008_writer.write(record)
-      else
-        record = clean_record(record)
-        record.leader[9] = 'a' # Make record parse as UTF-8
-        writer.write(record)
+        if bad_utf8?(record)
+          bad_utf8_writer.write(record)
+        end
+        record = harrslav_fix(record) if load_profile.import_code == 'harrslav'
+        record = bad_utf8_fix(record)
+        if invalid_xml_chars?(record)
+          inv_xml_writer.write(record)
+        end
+        if multiple_no_245?(record)
+          error_245_writer.write(record)
+        elsif multiple_no_008?(record)
+          error_008_writer.write(record)
+        else
+          record = clean_record(record)
+          record.leader[9] = 'a' # Make record parse as UTF-8
+          writer.write(record)
+        end
       end
       writer.close
       bad_utf8_writer.close
