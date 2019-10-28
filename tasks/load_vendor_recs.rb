@@ -2,6 +2,7 @@ require_relative './../lib/vger_vendor_loads'
 require 'fileutils'
 require 'mail'
 require 'psych'
+require 'date'
 
 Mail.defaults do
   delivery_method :sendmail
@@ -11,10 +12,13 @@ from_email = ENV['SYS_EMAIL']
 import_command = ENV['BULK_IMPORT_COMMAND']
 default_options = '-K ADDKEY'
 operator_initials = ENV['VENDOR_LOAD_INITIALS']
+gobi_initials = ENV['GOBI_LOAD_INITIALS']
+gobi_dateval = Date.today.strftime('%Y%m%d')
 err_email = ENV['VENDOR_ERR_EMAIL']
 all_profiles = Psych.load_file(ENV['LOAD_PROFILE_FILE'])
 all_profiles.each do |profile|
   load_profile = LoadProfile.new(profile['dir'], profile['code'], profile['emails'], profile['encoding'])
+  default_options = '' if load_profile.import_code =~ /^ybpsr|^sfx|^repv$/
   to_email = load_profile.emails.join(',')
   load_profile.incoming_files.each do |file|
     filename = File.basename(file)
@@ -67,6 +71,7 @@ all_profiles.each do |profile|
           bad_utf8_writer.write(record)
         end
         record = harrslav_fix(record) if load_profile.import_code == 'harrslav'
+        record = gobi_904(record, gobi_initials, gobi_dateval) if load_profile.import_code =~ /^ybpsr/
         record = bad_utf8_fix(record)
         if invalid_xml_chars?(record)
           inv_xml_writer.write(record)
