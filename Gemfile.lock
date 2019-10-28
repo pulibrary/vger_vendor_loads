@@ -1,0 +1,31 @@
+GIT
+  remote: git://github.com/pulibrary/marc_cleanup.git
+  revision: 7c6a349e5c3508902aad73b206527427d7380f6c
+  tag: v0.8.6
+  specs:
+    marc_cleanup (0.8.6)
+      marc (~> 1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    mail (2.7.0)
+      mini_mime (>= 0.1.1)
+    marc (1.0.4)
+      scrub_rb (>= 1.0.1, < 2)
+      unf
+    mini_mime (1.0.1)
+    scrub_rb (1.0.1)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  mail (~> 2.6)
+  marc_cleanup!
+
+BUNDLED WITH
+   1.17.3
