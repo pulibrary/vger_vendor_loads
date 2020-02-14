@@ -2,3 +2,4 @@ source 'https://rubygems.org'
 
 gem 'mail', '~> 2.6'
 gem 'marc_cleanup', github: "pulibrary/marc_cleanup", tag: 'v0.8.6'
+gem 'irb', require: false

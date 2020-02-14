@@ -15,6 +15,7 @@ operator_initials = ENV['VENDOR_LOAD_INITIALS']
 gobi_initials = ENV['GOBI_LOAD_INITIALS']
 gobi_dateval = Date.today.strftime('%Y%m%d')
 err_email = ENV['VENDOR_ERR_EMAIL']
+mary_martin_dateval = Date.today.strftime('%y%m%d')
 all_profiles = Psych.load_file(ENV['LOAD_PROFILE_FILE'])
 all_profiles.each do |profile|
   load_profile = LoadProfile.new(profile['dir'], profile['code'], profile['emails'], profile['encoding'])
@@ -72,6 +73,7 @@ all_profiles.each do |profile|
         end
         record = harrslav_fix(record) if load_profile.import_code == 'harrslav'
         record = gobi_904(record, gobi_initials, gobi_dateval) if load_profile.import_code =~ /^ybpsr/
+        record = mary_martin_008(record, mary_martin_dateval) if load_profile.import_code == 'mary_frm'
         record = bad_utf8_fix(record)
         if invalid_xml_chars?(record)
           inv_xml_writer.write(record)
